@@ -1,13 +1,13 @@
-var restify = require('restify')
+// var restify = require('restify')
 var botbuilder = require('botbuilder')
 
-var server = restify.createServer({
-    name: 'ebertlastbot',
-    // url: 'http://186.145.16.130'
-})
-server.listen(process.env.port || process.env.PORT || 3978, function () {
-    console.log(`${server.name} escuchando en ${server.url}`)
-})
+// var server = restify.createServer({
+//     name: 'ebertlastbot',
+//     // url: 'http://186.145.16.130'
+// })
+// server.listen(process.env.port || process.env.PORT || 3978, function () {
+//     console.log(`${server.name} escuchando en ${server.url}`)
+// })
 
 
 var connector = new botbuilder.ChatConnector({
@@ -16,7 +16,7 @@ var connector = new botbuilder.ChatConnector({
 })
 
 var bot = new botbuilder.UniversalBot(connector)
-server.post('/api/messages', connector.listen())
+// server.post('/api/messages', connector.listen())
 
 bot.dialog('/', [
     function (session, results, next) {
