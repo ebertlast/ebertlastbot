@@ -1,14 +1,18 @@
 var restify = require('restify')
 var botbuilder = require('botbuilder')
 
-var server = restify.createServer()
+var server = restify.createServer({
+    name: 'ebertlastbot',
+    // url: 'http://186.145.16.130'
+})
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log(`${server.name} escuchando en ${server.url}`)
 })
 
+
 var connector = new botbuilder.ChatConnector({
-    appId: '',
-    appPassword: ''
+    appId: '7d732b29-cabe-4800-9ec2-8a04341648a3',
+    appPassword: 'RKCYtj/l0X]&MF7['
 })
 
 var bot = new botbuilder.UniversalBot(connector)
