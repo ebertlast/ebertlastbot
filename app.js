@@ -3,7 +3,7 @@ A simple echo bot for the Microsoft Bot Framework.
 -----------------------------------------------------------------------------*/
 
 var restify = require('restify');
-var builder = require('botbuilder');
+var bb = require('botbuilder');
 var botbuilder_azure = require("botbuilder-azure");
 
 // Setup Restify Server
@@ -13,7 +13,7 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 });
 
 // Create chat connector for communicating with the Bot Framework Service
-var connector = new builder.ChatConnector({
+var connector = new bb.ChatConnector({
     appId: process.env.MicrosoftAppId,
     appPassword: process.env.MicrosoftAppPassword,
     openIdMetadata: process.env.BotOpenIdMetadata
@@ -33,7 +33,7 @@ var azureTableClient = new botbuilder_azure.AzureTableClient(tableName, process.
 var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azureTableClient);
 
 // Create your bot with a function to receive messages from the user
-var bot = new builder.UniversalBot(connector);
+var bot = new bb.UniversalBot(connector);
 bot.set('storage', tableStorage);
 
 bot.dialog('/', [
@@ -41,28 +41,28 @@ bot.dialog('/', [
         session.sendTyping();
         setTimeout(function () {
             // session.send("Hello there...");
-            botbuilder.Prompts.text(session, '¿Cómo te llamas?')
+            bb.Prompts.text(session, '¿Cómo te llamas?')
         }, 3000);
     },
     function (session, results) {
         session.dialogData.nombre = results.response
         session.sendTyping();
-        botbuilder.Prompts.number(session, `Hola ${session.dialogData.nombre}, ¿que edad tienes?`)
+        bb.Prompts.number(session, `Hola ${session.dialogData.nombre}, ¿que edad tienes?`)
     },
     function (session, results) {
         session.dialogData.edad = results.response
         session.sendTyping();
-        botbuilder.Prompts.time(session, '¿Que hora marca tu reloj?')
+        bb.Prompts.time(session, '¿Que hora marca tu reloj?')
     },
     function (session, results) {
-        session.dialogData.hora = botbuilder.EntityRecognizer.resolveTime([results.response]);
+        session.dialogData.hora = bb.EntityRecognizer.resolveTime([results.response]);
         session.sendTyping();
-        botbuilder.Prompts.choice(session, '¿Cual prefieres?', 'Mar|Montaña', { listStyle: botbuilder.ListStyle.button });
+        bb.Prompts.choice(session, '¿Cual prefieres?', 'Mar|Montaña', { listStyle: bb.ListStyle.button });
     },
     function (session, results) {
         session.dialogData.preferencia = results.response.entity
         session.sendTyping();
-        botbuilder.Prompts.confirm(session, '¿Deseas ver un resumen?', { listStyle: botbuilder.ListStyle.button })
+        bb.Prompts.confirm(session, '¿Deseas ver un resumen?', { listStyle: bb.ListStyle.button })
     },
     function (session, results) {
         if (results.response) {
