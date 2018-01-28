@@ -66,13 +66,13 @@ bot.dialog('/', [
     },
     function (session, results) {
         if (results.response) {
+            session.send(`appId: ${process.env.MicrosoftAppId}, appPassword: ${process.env.MicrosoftAppPassword}, openIdMetadata: ${process.env.BotOpenIdMetadata}`)
             session.endDialog(`Me comentaste que te llamas **${session.dialogData.nombre}**, que tienes **${session.dialogData.edad}** años, que tu reloj marca **${session.dialogData.hora}** y que prefieres **${session.dialogData.preferencia}**.`)
         } else {
             session.endDialog('Hasta luego')
         }
     }
     // function (session) {
-    //     session.send(`appId: ${process.env.MicrosoftAppId}, appPassword: ${process.env.MicrosoftAppPassword}, openIdMetadata: ${process.env.BotOpenIdMetadata}`)
     //     session.send('You said ' + session.message.text);
     // }
 ]);
