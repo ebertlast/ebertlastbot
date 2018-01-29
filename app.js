@@ -65,6 +65,7 @@ intents.onBegin(function (session, args, next) {
 intents.matches('noticias', '/noticias')
 intents.matches('saludo', '/saludo')
 intents.matches('despedida', '/despedida')
+intents.matches('videos', '/videos')
 
 // #region middleware
 bot.use({
@@ -138,7 +139,7 @@ bot.dialog('/noticias', [
                     return session.endDialog(`Creo que no tengo noticias de ${q}, intenta con otra palabra!`);
                 }
                 let articulos = JSON.parse(body).articles
-                console.log(`Cantidad de Artículos: ${articulos.length}`)
+                // console.log(`Cantidad de Artículos: ${articulos.length}`)
                 // console.log(articulos);
                 let tarjetas = []
                 let count = 0
@@ -189,6 +190,88 @@ bot.dialog('/noticias', [
 
     }
 ]);
+
+
+bot.dialog('/videos', [
+    function (session, args, next) {
+        let nombre = args.result.parameters.nombre;
+        if (!nombre || nombre === '') {
+            bb.Prompts.text(session, '¿Sobre quién me dijiste?')
+        } else {
+            session.dialogData.nombre_video = nombre
+            next()
+        }
+    },
+    function (session, results, next) {
+        // console.log(`results.response: ${results.response}`)
+        // console.log(session.dialogData.nombre_video)
+        if (!session.dialogData.nombre_video || session.dialogData.nombre_video === '') {
+            session.dialogData.nombre_video = results.response
+        }
+        // console.log(session.dialogData.nombre_video)
+
+        next()
+    },
+    function (session, args, next) {
+        let q = session.dialogData.nombre_video;
+        let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${q}&key=${process.env.YoutubeAppKey}`
+        session.endDialog(`Consultando videos de ${q}`);
+        Request.get(url, (error, response, body) => {
+            if (error) {
+                // return console.log(error);
+                console.log(error)
+                return session.endDialog(`No encontré videos de ${q}, intenta con otra palabra!`);
+            }
+            let tarjetas = []
+            let count = 0
+
+
+            // console.log(body)
+
+            JSON.parse(body).items.forEach(video => {
+                // console.log(`video.videoId: ${video.id.videoId}`)
+                if (video.id.videoId) {
+                    let titulo = video.snippet.title
+                    let subtitulo = `Fecha: ${video.snippet.publishedAt}`
+                    if (video.snippet.channelTitle) { subtitulo += ` - Canal: ${video.snippet.channelTitle} ` }
+                    let cuerpo = video.snippet.description
+                    let imagen = (video.snippet.thumbnails.high.url) ? video.snippet.thumbnails.high.url : `http://denrakaev.com/wp-content/uploads/2015/03/no-image-800x511.png`
+                    let urlvideo = `https://www.youtube.com/watch?v=${video.id.videoId}`
+                    // console.log(`imagen: ${imagen}`)
+                    let tarjeta = new bb.HeroCard(session)
+                        .title(titulo)
+                        .subtitle(subtitulo)
+                        .text(cuerpo)
+                        .images([
+                            bb.CardImage.create(session, imagen)
+                        ])
+                        .buttons([
+                            bb.CardAction.openUrl(session, urlvideo, 'Ver video')
+                        ])
+                    tarjetas.push(tarjeta)
+                    if (++count === 6) {
+                        let msj = new bb.Message(session)
+                            .attachmentLayout(bb.AttachmentLayout.carousel)
+                            .attachments(tarjetas)
+                        session.send(msj);
+                        count = 0
+                        tarjetas = []
+                    }
+                }
+            })
+
+            if (tarjetas.length > 0) {
+                let msj = new bb.Message(session)
+                    .attachmentLayout(bb.AttachmentLayout.carousel)
+                    .attachments(tarjetas)
+                session.endDialog(msj);
+            } else {
+                session.endDialog(`No encontré videos de ${q}, intenta con otra palabra!`);
+            }
+            // session.endDialog(`Creo que no tengo noticias de ${q}, intenta con otra palabra!`);
+        })
+    }
+])
 
 intents.onDefault(function (session, args) {
     // session.sendTyping();
