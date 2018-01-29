@@ -8,8 +8,8 @@ var botbuilder_azure = require('botbuilder-azure');
 var apiaiRecognizer = require('./apiai_recognizer')
 var Request = require('request')
 
-var dotenv = require('dotenv')
-dotenv.config()
+// var dotenv = require('dotenv')
+// dotenv.config()
 
 // Setup Restify Server
 var server = restify.createServer();

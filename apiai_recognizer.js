@@ -1,6 +1,6 @@
 var apiai = require('apiai')
-var dotenv = require('dotenv')
-dotenv.config()
+// var dotenv = require('dotenv')
+// dotenv.config()
 
 var app = apiai(process.env.APIAIAppId)
 
