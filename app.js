@@ -141,7 +141,10 @@ bot.dialog('/noticias', [
                 let articulos = JSON.parse(body).articles
                 // console.log(articulos);
                 let tarjetas = []
+                let count = 0
+
                 articulos.forEach(articulo => {
+
                     let titulo = articulo.title
                     let subtitulo = `Fecha: ${articulo.publishedAt}`
                     if (articulo.source.name) { subtitulo += ` - Fuente: ${articulo.source.name} ` }
@@ -160,7 +163,9 @@ bot.dialog('/noticias', [
                         .buttons([
                             bb.CardAction.openUrl(session, urlArticulo, 'Saber más')
                         ])
-                    tarjetas.push(tarjeta)
+                    if (++count <= 6) {
+                        tarjetas.push(tarjeta)
+                    }
                 });
                 if (tarjetas.length > 0) {
                     let msj = new bb.Message(session)
