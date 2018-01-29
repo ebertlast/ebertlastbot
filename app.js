@@ -127,7 +127,6 @@ bot.dialog('/noticias', [
         // .attachments(cards);
         // let temas = bb.EntityRecognizer.findAllEntities(args.result.parameters, 'tema');
         // console.log('**********************************************************')
-        // console.log(temas)
         if (args.result.parameters.tema !== '') {
             let q = args.result.parameters.tema
             session.send(`Noticias más importantes sobre ${q}`);
@@ -139,6 +138,7 @@ bot.dialog('/noticias', [
                     return session.endDialog(`Creo que no tengo noticias de ${q}, intenta con otra palabra!`);
                 }
                 let articulos = JSON.parse(body).articles
+                console.log(`Cantidad de Artículos: ${articulos.length}`)
                 // console.log(articulos);
                 let tarjetas = []
                 let count = 0
@@ -150,7 +150,7 @@ bot.dialog('/noticias', [
                     if (articulo.source.name) { subtitulo += ` - Fuente: ${articulo.source.name} ` }
                     if (articulo.source.author) { subtitulo += ` - Autor: ${articulo.source.author} ` }
                     let cuerpo = articulo.description
-                    console.log(articulo.urlToImage);
+                    // console.log(articulo.urlToImage);
                     let imagen = (articulo.urlToImage) ? articulo.urlToImage : `http://denrakaev.com/wp-content/uploads/2015/03/no-image-800x511.png`
                     let urlArticulo = articulo.url
                     let tarjeta = new bb.HeroCard(session)
@@ -163,8 +163,14 @@ bot.dialog('/noticias', [
                         .buttons([
                             bb.CardAction.openUrl(session, urlArticulo, 'Saber más')
                         ])
-                    if (++count <= 6) {
-                        tarjetas.push(tarjeta)
+                    tarjetas.push(tarjeta)
+                    if (++count === 6) {
+                        let msj = new bb.Message(session)
+                            .attachmentLayout(bb.AttachmentLayout.carousel)
+                            .attachments(tarjetas)
+                        session.send(msj);
+                        count = 0
+                        tarjetas = []
                     }
                 });
                 if (tarjetas.length > 0) {
